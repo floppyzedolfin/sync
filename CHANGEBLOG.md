@@ -1,5 +1,7 @@
 # Sync
 
+### First thoughts
+
 My first thought, after reading the assignment, was that my solution, 
 whatever it will be, won't be as complete as  other utilities. I won't wrap  
 over `rsync`, as explained. However, really early, I wanted to delegate the 
@@ -80,3 +82,10 @@ For now, let's be binary on this - a file will either have changed, or not
 have changed. There will be no partial change in the first version of this 
 code. We'll have plenty of time for that later.
 
+### Second thoughts
+After writing the skeleton of the server, I realised there is no real reason 
+for the `watcher` to be a service at all. It simply needs to be a binary. 
+Since I haven't started writing that part, it's not work lost. What's not 
+really nice, though, is the way I'll have to handle the `reference`'s local 
+copy path. I think I'll use a `/data/sync/` as the root dir in the docker 
+image. This should be fine.

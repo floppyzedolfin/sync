@@ -24,3 +24,46 @@ A: There are bonuses associated with the task that require to implement some sor
 Q: How deep should I go with this project? Even such a (small) project could potentially become quite complex. It depends on level of details.
 
 A: It is a very good question. The possibilities to "go deep" in this homework are endless. It is very interesting for us to see where a candidate decides to focus and where they decide to cut corners. If you want to, feel free to demonstrate your "strong suit": if you're a multithreading expert, put emphasis on parallel implementation; if you're into security -- implement something extra about that, and so on. That is why it is proven to be very useful for us. It is expected that you will not be able to implement everything you have on your mind. Just tell us about those areas where you would like things to improve. Keep that in mind.
+
+# Implementation
+
+You'll find a lot of though process in the [CHANGEBLOG.md](./CHANGEBLOG.md) 
+file, where I've let my quill slide on the keyboard. Choices, hesitations, 
+doubts - they all dwell over there.
+
+## How to?
+
+### ... get it
+Clone the repo to your machine:
+```bash
+git clone https://github.com/floppyzedolfin/sync.git
+```
+
+### ... compile it
+Use the `make` target:
+```bash
+make compile
+```
+
+### ... run it
+We've got two independent things here. A server and a client. You can run 
+both of them the way you want, but there's a target that will pop the server,
+and then start the client.
+```bash
+make run-all
+```
+The [`Makfeile`](./Makefile) provides several other (internal) targets. If 
+you examine it closely, you'll find that
+- a docker network is started, to simulate real networks and communication 
+  to a remote server;
+- for debugging, testing, and validation, the server write to its docker 
+  image, but the path within that docker image is actually mounted from this 
+  machine - this way, one can easily check that files have been updated;
+- there is an example playground which is the directory the server will 
+  mirror if you use the default `make` targets.
+
+### ... play with it
+Once everything is up and running, simply add, alter, move, delete files in 
+the directory that the `watcher` was given to examine. These changes should be 
+mirrored n the `reference` directory (because the server will update them in 
+its docker image).

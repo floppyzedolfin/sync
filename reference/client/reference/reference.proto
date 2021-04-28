@@ -1,0 +1,21 @@
+syntax = "proto3";
+option go_package = "github.com/floppyzedolfin/sync/services/reference";
+
+package reference;
+
+service reference {
+  // Send a notification about a change in the file system
+  rpc  Notify(NotifyRequest) returns (NotifyResponse) {}
+}
+
+// NotifyRequest holds the information about an item that has changed
+message NotifyRequest {
+  string fullPath = 1;
+  string fullContents = 2;
+  uint32 rights = 3;
+}
+
+// NotifyResponse is empty so far - we'll either return an error or nothing
+// "No news is good news" -- Aegeus
+message NotifyResponse {
+}
