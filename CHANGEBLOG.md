@@ -89,3 +89,11 @@ Since I haven't started writing that part, it's not work lost. What's not
 really nice, though, is the way I'll have to handle the `reference`'s local 
 copy path. I think I'll use a `/data/sync/` as the root dir in the docker 
 image. This should be fine.
+
+### Next thoughts
+I've written the Makefile. I have some issues with the passing of the rights 
+- what the world understands as "755", or "600", or "777" are octal numbers, 
+  which comes as an issue when trying to store them as uints. Because 0755 
+  == 493, which isn't really an interesting number (unless you enjoy [strange 
+  banquets](https://en.wikipedia.org/wiki/Ostrogothic_Kingdom#Theodoric_kills_Odoacer_(493))).
+  

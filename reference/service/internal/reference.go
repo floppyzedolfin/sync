@@ -11,6 +11,7 @@ type Service struct {
 	app *fiber.App
 }
 
+// New returns a fully operation service, implementing all the required endpoints
 func New() *Service {
 	var s Service
 	s.app = fiber.New()
@@ -18,10 +19,12 @@ func New() *Service {
 	return &s
 }
 
+// Listen to a port for messages
 func (s *Service) Listen(port int) {
 	s.app.Listen(fmt.Sprintf(":%d", port))
 }
 
+// registerEndpoints adds each endpoint to the service
 func (s *Service) registerEndpoints() {
 	s.app.Post("/notify", handlers2.Notify)
 }
