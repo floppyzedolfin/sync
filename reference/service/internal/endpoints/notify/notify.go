@@ -15,6 +15,7 @@ const (
 
 // Notify copies the content of the file locally
 func Notify(_ *fiber.Ctx,  req *reference2.NotifyRequest) (*reference2.NotifyResponse, *fiber.Error) {
+	// TODO : fix these permissions
 	err := ioutil.WriteFile(path.Join(localReplicaRoot, req.FullPath), []byte(req.FullContents), 0755)
 	if err != nil {
 		return nil, fiber.NewError(fiber.StatusInternalServerError)
