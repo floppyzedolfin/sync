@@ -27,7 +27,7 @@ A: It is a very good question. The possibilities to "go deep" in this homework a
 
 # Implementation
 
-You'll find a lot of though process in the [CHANGEBLOG.md](./CHANGEBLOG.md) 
+You'll find a lot of thought process in the [CHANGEBLOG.md](./CHANGEBLOG.md) 
 file, where I've let my quill slide on the keyboard. Choices, hesitations, 
 doubts - they all dwell over there.
 
