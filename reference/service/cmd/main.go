@@ -1,12 +1,13 @@
 package main
 
-import "github.com/floppyzedolfin/sync/reference/service/internal"
-
-const (
-	port = 8405
+import (
+	"github.com/floppyzedolfin/sync/reference/client"
+	"github.com/floppyzedolfin/sync/reference/service/internal"
 )
 
+
 func main() {
+	// start and run the server
 	server := internal.New()
-	server.Listen(port)
+	server.Listen(client.PortNumber)
 }

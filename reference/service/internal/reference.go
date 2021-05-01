@@ -3,10 +3,11 @@ package internal
 import (
 	"fmt"
 
-	handlers2 "github.com/floppyzedolfin/sync/reference/service/internal/handlers"
+	handlers "github.com/floppyzedolfin/sync/reference/service/internal/handlers"
 	"github.com/gofiber/fiber/v2"
 )
 
+// Service is our backend. It can listen to a port for messages.
 type Service struct {
 	app *fiber.App
 }
@@ -26,5 +27,6 @@ func (s *Service) Listen(port int) {
 
 // registerEndpoints adds each endpoint to the service
 func (s *Service) registerEndpoints() {
-	s.app.Post("/notify", handlers2.Notify)
+	s.app.Post( , handlers.Patch)
+	s.app.Post("/delete", handlers.Delete)
 }

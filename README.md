@@ -67,3 +67,8 @@ Once everything is up and running, simply add, alter, move, delete files in
 the directory that the `watcher` was given to examine. These changes should be 
 mirrored n the `reference` directory (because the server will update them in 
 its docker image).
+
+### TODOs & loopholes
+- user in docker
+- rights on files
+- 

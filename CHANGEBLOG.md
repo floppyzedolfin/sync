@@ -48,7 +48,7 @@ I'm writing two services:
 - `reference` will have a backup copy of the contents of the watched directory
 
 `watcher` won't really be receiving requests. `reference` will expose one 
-endpoint, probably `update`, that will be called by `watcher` to notify the 
+endpoint, probably `update`, that will be called by `watcher` to patch the 
 creation of new data (or update, or deletion thereof). Now, in order to 
 communicate, we need a protocol. I'll settle down with HTTP as it's what I 
 know, and [gRPC](https://grpc.io/), because I want to use that rather than 
@@ -74,8 +74,8 @@ Listening to system signals seems a better approach - indeed, in case of
 humongous directories with thousands of subfiles, the scanning would spend 
 most of its time performing checking nothing happened.
 
-So, let's dig into the system notifications - the [fsnotify](https://pkg.go.
-dev/github.com/fsnotify/fsnotify) Go lib seems to do the trick of detecting 
+So, let's dig into the system notifications - the [fspatch](https://pkg.go.
+dev/github.com/fspatch/fspatch) Go lib seems to do the trick of detecting 
 local changes, so we'll use it.
 
 For now, let's be binary on this - a file will either have changed, or not 
@@ -97,3 +97,24 @@ I've written the Makefile. I have some issues with the passing of the rights
   == 493, which isn't really an interesting number (unless you enjoy [strange 
   banquets](https://en.wikipedia.org/wiki/Ostrogothic_Kingdom#Theodoric_kills_Odoacer_(493))).
   
+### Get some rest
+After a good night of sleep, some questions arose:
+- if two files are updated simultaneously, do we want to make two requests 
+  to the server, or a single one? This can happen very easily, the first 
+  example I have in mind being `mv foo bar`, which `renames` foo and 
+  `creates` bar;
+- if a single file is updated twice in a row, do we want to shoot two 
+  messages, or a single one, with the "final" result? My example here is 
+  `echo foo > bar`, which first `creates` bar then  `modifies` it (we don't 
+  want to ignore creation of files, that would be too dangerous);
+- if N files are created at the same time, do I really want to shoot N 
+  requests to my server? Requests to the server must always be in order - 
+  that is, we don't want the messages of "override `foo` with `bar`" and 
+  "override `foo` with `zip`" to happen in a different order on the server.
+  
+After all these thoughts, I had several choices in mind:
+- keep using fspatch and shoot a request for each update
+- keep using fspatch, but use a "buffer" to store updates for N
+  milliseconds, and shoot a message containing all these N millisecond changes
+- use `os.Lstat` in a `for` loop to detect changes  
+ 

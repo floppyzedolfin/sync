@@ -10,9 +10,13 @@ REPLICA=${PWD}/example/replica
 generate:
 	${GO} generate ./...
 
-compile:
-	${GO} build -o build/watcher/watcher.out ./watcher/cmd
+compile-reference:
 	${GO} build -o build/reference/reference.out ./reference/service/cmd
+
+compile-watcher:
+	${GO} build -o build/watcher/watcher.out ./watcher/cmd
+
+compile-all: compile-reference compile-watcher
 
 test:
 	${GO} test ./...
@@ -23,9 +27,13 @@ build-all: compile
 network:
 	docker network create --subnet=178.18.0.0/16 network-${PROJECT} || true
 
-run-all: network
+run-reference: network
 	docker run -d -p 8405:8405 -v ${REPLICA}:/data/replica --network network-${PROJECT} --ip 178.18.0.23 --rm --name reference ${PROJECT}-reference:${VERSION}
-	build/watcher/watcher.out ${PLAYGROUND} &
+
+make run-watcher:
+	build/watcher/watcher.out ${PLAYGROUND}
+
+run-all: run-reference run-watcher
 
 stop-all:
 	docker stop reference

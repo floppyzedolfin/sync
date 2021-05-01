@@ -4,7 +4,6 @@ package reference
 
 import (
 	context "context"
-
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -19,8 +18,10 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ReferenceClient interface {
-	// Send a notification about a change in the file system
-	Notify(ctx context.Context, in *NotifyRequest, opts ...grpc.CallOption) (*NotifyResponse, error)
+	// Send a notification about a change of contents in the file system
+	Patch(ctx context.Context, in *PatchRequest, opts ...grpc.CallOption) (*PatchResponse, error)
+	// Delete an entity on the file system
+	Delete(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*DeleteResponse, error)
 }
 
 type referenceClient struct {
@@ -31,9 +32,18 @@ func NewReferenceClient(cc grpc.ClientConnInterface) ReferenceClient {
 	return &referenceClient{cc}
 }
 
-func (c *referenceClient) Notify(ctx context.Context, in *NotifyRequest, opts ...grpc.CallOption) (*NotifyResponse, error) {
-	out := new(NotifyResponse)
-	err := c.cc.Invoke(ctx, "/reference.reference/Notify", in, out, opts...)
+func (c *referenceClient) Patch(ctx context.Context, in *PatchRequest, opts ...grpc.CallOption) (*PatchResponse, error) {
+	out := new(PatchResponse)
+	err := c.cc.Invoke(ctx, "/reference.reference/Patch", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *referenceClient) Delete(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*DeleteResponse, error) {
+	out := new(DeleteResponse)
+	err := c.cc.Invoke(ctx, "/reference.reference/Delete", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -44,8 +54,10 @@ func (c *referenceClient) Notify(ctx context.Context, in *NotifyRequest, opts ..
 // All implementations must embed UnimplementedReferenceServer
 // for forward compatibility
 type ReferenceServer interface {
-	// Send a notification about a change in the file system
-	Notify(context.Context, *NotifyRequest) (*NotifyResponse, error)
+	// Send a notification about a change of contents in the file system
+	Patch(context.Context, *PatchRequest) (*PatchResponse, error)
+	// Delete an entity on the file system
+	Delete(context.Context, *DeleteRequest) (*DeleteResponse, error)
 	mustEmbedUnimplementedReferenceServer()
 }
 
@@ -53,8 +65,11 @@ type ReferenceServer interface {
 type UnimplementedReferenceServer struct {
 }
 
-func (UnimplementedReferenceServer) Notify(context.Context, *NotifyRequest) (*NotifyResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Notify not implemented")
+func (UnimplementedReferenceServer) Patch(context.Context, *PatchRequest) (*PatchResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Patch not implemented")
+}
+func (UnimplementedReferenceServer) Delete(context.Context, *DeleteRequest) (*DeleteResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
 }
 func (UnimplementedReferenceServer) mustEmbedUnimplementedReferenceServer() {}
 
@@ -69,20 +84,38 @@ func RegisterReferenceServer(s grpc.ServiceRegistrar, srv ReferenceServer) {
 	s.RegisterService(&Reference_ServiceDesc, srv)
 }
 
-func _Reference_Notify_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(NotifyRequest)
+func _Reference_Patch_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PatchRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ReferenceServer).Notify(ctx, in)
+		return srv.(ReferenceServer).Patch(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/reference.reference/Notify",
+		FullMethod: "/reference.reference/Patch",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ReferenceServer).Notify(ctx, req.(*NotifyRequest))
+		return srv.(ReferenceServer).Patch(ctx, req.(*PatchRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Reference_Delete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ReferenceServer).Delete(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/reference.reference/Delete",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ReferenceServer).Delete(ctx, req.(*DeleteRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -95,8 +128,12 @@ var Reference_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*ReferenceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "Notify",
-			Handler:    _Reference_Notify_Handler,
+			MethodName: "Patch",
+			Handler:    _Reference_Patch_Handler,
+		},
+		{
+			MethodName: "Delete",
+			Handler:    _Reference_Delete_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

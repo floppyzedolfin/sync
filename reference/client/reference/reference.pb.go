@@ -7,11 +7,10 @@
 package reference
 
 import (
-	reflect "reflect"
-	sync "sync"
-
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	reflect "reflect"
+	sync "sync"
 )
 
 const (
@@ -21,8 +20,8 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// NotifyRequest holds the information about an item that has changed
-type NotifyRequest struct {
+// PatchRequest holds the information about an item that has changed
+type PatchRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -32,8 +31,8 @@ type NotifyRequest struct {
 	Rights       uint32 `protobuf:"varint,3,opt,name=rights,proto3" json:"rights,omitempty"`
 }
 
-func (x *NotifyRequest) Reset() {
-	*x = NotifyRequest{}
+func (x *PatchRequest) Reset() {
+	*x = PatchRequest{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_reference_reference_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -41,13 +40,13 @@ func (x *NotifyRequest) Reset() {
 	}
 }
 
-func (x *NotifyRequest) String() string {
+func (x *PatchRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*NotifyRequest) ProtoMessage() {}
+func (*PatchRequest) ProtoMessage() {}
 
-func (x *NotifyRequest) ProtoReflect() protoreflect.Message {
+func (x *PatchRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_reference_reference_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -59,42 +58,42 @@ func (x *NotifyRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use NotifyRequest.ProtoReflect.Descriptor instead.
-func (*NotifyRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use PatchRequest.ProtoReflect.Descriptor instead.
+func (*PatchRequest) Descriptor() ([]byte, []int) {
 	return file_reference_reference_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *NotifyRequest) GetFullPath() string {
+func (x *PatchRequest) GetFullPath() string {
 	if x != nil {
 		return x.FullPath
 	}
 	return ""
 }
 
-func (x *NotifyRequest) GetFullContents() string {
+func (x *PatchRequest) GetFullContents() string {
 	if x != nil {
 		return x.FullContents
 	}
 	return ""
 }
 
-func (x *NotifyRequest) GetRights() uint32 {
+func (x *PatchRequest) GetRights() uint32 {
 	if x != nil {
 		return x.Rights
 	}
 	return 0
 }
 
-// NotifyResponse is empty so far - we'll either return an error or nothing
+// PatchResponse is empty so far - we'll either return an error or nothing
 // "No news is good news" -- Aegeus
-type NotifyResponse struct {
+type PatchResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 }
 
-func (x *NotifyResponse) Reset() {
-	*x = NotifyResponse{}
+func (x *PatchResponse) Reset() {
+	*x = PatchResponse{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_reference_reference_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -102,13 +101,13 @@ func (x *NotifyResponse) Reset() {
 	}
 }
 
-func (x *NotifyResponse) String() string {
+func (x *PatchResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*NotifyResponse) ProtoMessage() {}
+func (*PatchResponse) ProtoMessage() {}
 
-func (x *NotifyResponse) ProtoReflect() protoreflect.Message {
+func (x *PatchResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_reference_reference_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -120,9 +119,96 @@ func (x *NotifyResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use NotifyResponse.ProtoReflect.Descriptor instead.
-func (*NotifyResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use PatchResponse.ProtoReflect.Descriptor instead.
+func (*PatchResponse) Descriptor() ([]byte, []int) {
 	return file_reference_reference_proto_rawDescGZIP(), []int{1}
+}
+
+// DeleteRequest contains the path of the entity to delete
+type DeleteRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	FullPath string `protobuf:"bytes,1,opt,name=fullPath,proto3" json:"fullPath,omitempty"`
+}
+
+func (x *DeleteRequest) Reset() {
+	*x = DeleteRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_reference_reference_proto_msgTypes[2]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *DeleteRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteRequest) ProtoMessage() {}
+
+func (x *DeleteRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_reference_reference_proto_msgTypes[2]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteRequest.ProtoReflect.Descriptor instead.
+func (*DeleteRequest) Descriptor() ([]byte, []int) {
+	return file_reference_reference_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *DeleteRequest) GetFullPath() string {
+	if x != nil {
+		return x.FullPath
+	}
+	return ""
+}
+
+// DeleteResponse is always empty
+type DeleteResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *DeleteResponse) Reset() {
+	*x = DeleteResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_reference_reference_proto_msgTypes[3]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *DeleteResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteResponse) ProtoMessage() {}
+
+func (x *DeleteResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_reference_reference_proto_msgTypes[3]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteResponse.ProtoReflect.Descriptor instead.
+func (*DeleteResponse) Descriptor() ([]byte, []int) {
+	return file_reference_reference_proto_rawDescGZIP(), []int{3}
 }
 
 var File_reference_reference_proto protoreflect.FileDescriptor
@@ -130,23 +216,31 @@ var File_reference_reference_proto protoreflect.FileDescriptor
 var file_reference_reference_proto_rawDesc = []byte{
 	0x0a, 0x19, 0x72, 0x65, 0x66, 0x65, 0x72, 0x65, 0x6e, 0x63, 0x65, 0x2f, 0x72, 0x65, 0x66, 0x65,
 	0x72, 0x65, 0x6e, 0x63, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x09, 0x72, 0x65, 0x66,
-	0x65, 0x72, 0x65, 0x6e, 0x63, 0x65, 0x22, 0x67, 0x0a, 0x0d, 0x4e, 0x6f, 0x74, 0x69, 0x66, 0x79,
-	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x1a, 0x0a, 0x08, 0x66, 0x75, 0x6c, 0x6c, 0x50,
-	0x61, 0x74, 0x68, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x66, 0x75, 0x6c, 0x6c, 0x50,
-	0x61, 0x74, 0x68, 0x12, 0x22, 0x0a, 0x0c, 0x66, 0x75, 0x6c, 0x6c, 0x43, 0x6f, 0x6e, 0x74, 0x65,
-	0x6e, 0x74, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0c, 0x66, 0x75, 0x6c, 0x6c, 0x43,
-	0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x73, 0x12, 0x16, 0x0a, 0x06, 0x72, 0x69, 0x67, 0x68, 0x74,
-	0x73, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x06, 0x72, 0x69, 0x67, 0x68, 0x74, 0x73, 0x22,
-	0x10, 0x0a, 0x0e, 0x4e, 0x6f, 0x74, 0x69, 0x66, 0x79, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
-	0x65, 0x32, 0x4c, 0x0a, 0x09, 0x72, 0x65, 0x66, 0x65, 0x72, 0x65, 0x6e, 0x63, 0x65, 0x12, 0x3f,
-	0x0a, 0x06, 0x4e, 0x6f, 0x74, 0x69, 0x66, 0x79, 0x12, 0x18, 0x2e, 0x72, 0x65, 0x66, 0x65, 0x72,
-	0x65, 0x6e, 0x63, 0x65, 0x2e, 0x4e, 0x6f, 0x74, 0x69, 0x66, 0x79, 0x52, 0x65, 0x71, 0x75, 0x65,
-	0x73, 0x74, 0x1a, 0x19, 0x2e, 0x72, 0x65, 0x66, 0x65, 0x72, 0x65, 0x6e, 0x63, 0x65, 0x2e, 0x4e,
-	0x6f, 0x74, 0x69, 0x66, 0x79, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x42,
-	0x33, 0x5a, 0x31, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x66, 0x6c,
-	0x6f, 0x70, 0x70, 0x79, 0x7a, 0x65, 0x64, 0x6f, 0x6c, 0x66, 0x69, 0x6e, 0x2f, 0x73, 0x79, 0x6e,
-	0x63, 0x2f, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x73, 0x2f, 0x72, 0x65, 0x66, 0x65, 0x72,
-	0x65, 0x6e, 0x63, 0x65, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x65, 0x72, 0x65, 0x6e, 0x63, 0x65, 0x22, 0x66, 0x0a, 0x0c, 0x50, 0x61, 0x74, 0x63, 0x68, 0x52,
+	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x1a, 0x0a, 0x08, 0x66, 0x75, 0x6c, 0x6c, 0x50, 0x61,
+	0x74, 0x68, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x66, 0x75, 0x6c, 0x6c, 0x50, 0x61,
+	0x74, 0x68, 0x12, 0x22, 0x0a, 0x0c, 0x66, 0x75, 0x6c, 0x6c, 0x43, 0x6f, 0x6e, 0x74, 0x65, 0x6e,
+	0x74, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0c, 0x66, 0x75, 0x6c, 0x6c, 0x43, 0x6f,
+	0x6e, 0x74, 0x65, 0x6e, 0x74, 0x73, 0x12, 0x16, 0x0a, 0x06, 0x72, 0x69, 0x67, 0x68, 0x74, 0x73,
+	0x18, 0x03, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x06, 0x72, 0x69, 0x67, 0x68, 0x74, 0x73, 0x22, 0x0f,
+	0x0a, 0x0d, 0x50, 0x61, 0x74, 0x63, 0x68, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22,
+	0x2b, 0x0a, 0x0d, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
+	0x12, 0x1a, 0x0a, 0x08, 0x66, 0x75, 0x6c, 0x6c, 0x50, 0x61, 0x74, 0x68, 0x18, 0x01, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x08, 0x66, 0x75, 0x6c, 0x6c, 0x50, 0x61, 0x74, 0x68, 0x22, 0x10, 0x0a, 0x0e,
+	0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x32, 0x8a,
+	0x01, 0x0a, 0x09, 0x72, 0x65, 0x66, 0x65, 0x72, 0x65, 0x6e, 0x63, 0x65, 0x12, 0x3c, 0x0a, 0x05,
+	0x50, 0x61, 0x74, 0x63, 0x68, 0x12, 0x17, 0x2e, 0x72, 0x65, 0x66, 0x65, 0x72, 0x65, 0x6e, 0x63,
+	0x65, 0x2e, 0x50, 0x61, 0x74, 0x63, 0x68, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x18,
+	0x2e, 0x72, 0x65, 0x66, 0x65, 0x72, 0x65, 0x6e, 0x63, 0x65, 0x2e, 0x50, 0x61, 0x74, 0x63, 0x68,
+	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x3f, 0x0a, 0x06, 0x44, 0x65,
+	0x6c, 0x65, 0x74, 0x65, 0x12, 0x18, 0x2e, 0x72, 0x65, 0x66, 0x65, 0x72, 0x65, 0x6e, 0x63, 0x65,
+	0x2e, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x19,
+	0x2e, 0x72, 0x65, 0x66, 0x65, 0x72, 0x65, 0x6e, 0x63, 0x65, 0x2e, 0x44, 0x65, 0x6c, 0x65, 0x74,
+	0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x42, 0x33, 0x5a, 0x31, 0x67,
+	0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x66, 0x6c, 0x6f, 0x70, 0x70, 0x79,
+	0x7a, 0x65, 0x64, 0x6f, 0x6c, 0x66, 0x69, 0x6e, 0x2f, 0x73, 0x79, 0x6e, 0x63, 0x2f, 0x73, 0x65,
+	0x72, 0x76, 0x69, 0x63, 0x65, 0x73, 0x2f, 0x72, 0x65, 0x66, 0x65, 0x72, 0x65, 0x6e, 0x63, 0x65,
+	0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -161,16 +255,20 @@ func file_reference_reference_proto_rawDescGZIP() []byte {
 	return file_reference_reference_proto_rawDescData
 }
 
-var file_reference_reference_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_reference_reference_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_reference_reference_proto_goTypes = []interface{}{
-	(*NotifyRequest)(nil),  // 0: reference.NotifyRequest
-	(*NotifyResponse)(nil), // 1: reference.NotifyResponse
+	(*PatchRequest)(nil),   // 0: reference.PatchRequest
+	(*PatchResponse)(nil),  // 1: reference.PatchResponse
+	(*DeleteRequest)(nil),  // 2: reference.DeleteRequest
+	(*DeleteResponse)(nil), // 3: reference.DeleteResponse
 }
 var file_reference_reference_proto_depIdxs = []int32{
-	0, // 0: reference.reference.Notify:input_type -> reference.NotifyRequest
-	1, // 1: reference.reference.Notify:output_type -> reference.NotifyResponse
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
+	0, // 0: reference.reference.Patch:input_type -> reference.PatchRequest
+	2, // 1: reference.reference.Delete:input_type -> reference.DeleteRequest
+	1, // 2: reference.reference.Patch:output_type -> reference.PatchResponse
+	3, // 3: reference.reference.Delete:output_type -> reference.DeleteResponse
+	2, // [2:4] is the sub-list for method output_type
+	0, // [0:2] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
@@ -183,7 +281,7 @@ func file_reference_reference_proto_init() {
 	}
 	if !protoimpl.UnsafeEnabled {
 		file_reference_reference_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*NotifyRequest); i {
+			switch v := v.(*PatchRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -195,7 +293,31 @@ func file_reference_reference_proto_init() {
 			}
 		}
 		file_reference_reference_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*NotifyResponse); i {
+			switch v := v.(*PatchResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_reference_reference_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*DeleteRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_reference_reference_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*DeleteResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -213,7 +335,7 @@ func file_reference_reference_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_reference_reference_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
