@@ -1,4 +1,4 @@
-FROM alpine
+FROM scratch
 
 USER replicant
 COPY reference.out /app/server.out

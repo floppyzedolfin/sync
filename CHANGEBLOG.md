@@ -134,3 +134,9 @@ foo/bar`, with my code starting to listen at `foo` after the creation of
 foo/bar. 
 
 I need some more tests than those I manually performed.
+
+After some time fighting against the slowness of launching routines, I've 
+finally finished writing my tests. I've added some automatism on the CI. 
+If I work on the links, it'll be on the morrow, as I am now facing trouble 
+getting the CI build my code... It might be because the go version of 
+`ubuntu:latest` isn't the latest version of go.
