@@ -5,33 +5,36 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
-	"github.com/floppyzedolfin/sync/reference/client"
-	"github.com/floppyzedolfin/sync/reference/client/reference"
+	pb "github.com/floppyzedolfin/sync/replica/replica"
 	"github.com/howeyc/fsnotify"
 )
 
 type Watcher struct {
-	notifier  *fsnotify.Watcher
-	refClient client.API
+	notifier      *fsnotify.Watcher
+	rootDir string
+	replicaClient pb.ReplicaClient
 }
 
-func New(refClient client.API) (*Watcher, error) {
+func New(replicaClient pb.ReplicaClient) (*Watcher, error) {
 	notifier, err := fsnotify.NewWatcher()
 	if err != nil {
 		return nil, fmt.Errorf("unable to instantiate fswatcher")
 	}
 	w := new(Watcher)
 	w.notifier = notifier
-	w.refClient = refClient
+	w.replicaClient = replicaClient
 	return w, nil
 }
 
 func (w *Watcher) Watch(dirname string) error {
 	defer w.notifier.Close()
-
 	ctx, cancelFunc := context.WithCancel(context.Background())
+
+	w.rootDir = dirname
+
 	// start the polling routing
 	go w.poll(ctx, cancelFunc)
 
@@ -51,7 +54,7 @@ func (w *Watcher) Watch(dirname string) error {
 
 func (w *Watcher) poll(ctx context.Context, cancelFunc context.CancelFunc) {
 	const (
-		notificationFrequency = time.Second
+		notificationFrequency = 5*time.Second
 		cacheLimit            = 1
 	)
 	ticker := time.NewTicker(notificationFrequency)
@@ -60,7 +63,7 @@ func (w *Watcher) poll(ctx context.Context, cancelFunc context.CancelFunc) {
 		select {
 		case ev := <-w.notifier.Event:
 			fmt.Printf("notif on : %s\n", ev.Name)
-			err := w.checkDir(ev)
+			err := w.checkDir(ctx, ev)
 			if err != nil {
 				fmt.Printf("error while checking path %s: %s; aborting...", ev.Name, err.Error())
 				cancelFunc()
@@ -87,7 +90,7 @@ func (w *Watcher) poll(ctx context.Context, cancelFunc context.CancelFunc) {
 }
 
 func (w *Watcher) sendCache(ctx context.Context, cache []*fsnotify.FileEvent) error {
-	fmt.Printf("sending cache of %n\n", len(cache))
+	fmt.Printf("sending cache of %d\n", len(cache))
 	if len(cache) == 0 {
 		return nil
 	}
@@ -104,7 +107,7 @@ func (w *Watcher) sendCache(ctx context.Context, cache []*fsnotify.FileEvent) er
 	var err error
 	for filePath, update := range updatedFiles {
 		if update {
-			err = w.patch(ctx, filePath)
+			err = w.patchFile(ctx, filePath)
 		} else {
 			err = w.delete(ctx, filePath)
 		}
@@ -115,35 +118,56 @@ func (w *Watcher) sendCache(ctx context.Context, cache []*fsnotify.FileEvent) er
 	return nil
 }
 
-func (w *Watcher) patch(ctx context.Context, filePath string) error {
+func (w *Watcher) patchFile(ctx context.Context, filePath string) error {
 	contents, err := os.ReadFile(filePath)
 	if err != nil {
 		return fmt.Errorf("unable to read contents of file %s: %w", filePath, err)
 	}
-	patchRequest := reference.PatchRequest{
-		FullPath:     filePath,
+	rights, err := getRights(filePath)
+	if err != nil {
+		return fmt.Errorf("unable to get the rights of file %s: %w", filePath, err)
+	}
+	patchRequest := pb.PatchFileRequest{
+		FullPath:     strings.TrimPrefix(filePath, w.rootDir),
 		FullContents: string(contents),
-		Rights:       755,
+		Rights:       rights,
 	}
 	fmt.Printf("sending patch request %#v\n", patchRequest)
-	_, err = w.refClient.Patch(ctx, &patchRequest)
+	res, err := w.replicaClient.PatchFile(ctx, &patchRequest)
+	fmt.Printf("res: %#v\n", res)
 	if err != nil {
-		return fmt.Errorf("server error when patching %s: %w", filePath, err)
+		return fmt.Errorf("cmd error when patching %s: %w", filePath, err)
+	}
+	return nil
+}
+
+func (w *Watcher) createDir(ctx context.Context, dirPath string) error {
+	rights, err := getRights(dirPath)
+	if err != nil {
+		return fmt.Errorf("unable to get the rights of dir %s: %w", dirPath, err)
+	}
+	createDirRequest := pb.CreateDirRequest{
+		FullPath: strings.TrimPrefix(dirPath, w.rootDir),
+		Rights:   rights,
+	}
+	_, err = w.replicaClient.CreateDir(ctx, &createDirRequest)
+	if err !=  nil {
+		return fmt.Errorf("server error while creating dir %s: %w", dirPath, err)
 	}
 	return nil
 }
 
 func (w *Watcher) delete(ctx context.Context, filePath string) error {
-	deleteRequest := reference.DeleteRequest{FullPath: filePath}
-	_, err := w.refClient.Delete(ctx, &deleteRequest)
+	deleteRequest := pb.DeleteRequest{FullPath: strings.TrimPrefix(filePath, w.rootDir)}
+	_, err := w.replicaClient.Delete(ctx, &deleteRequest)
 	if err != nil {
-		return fmt.Errorf("server error while deleting %s on remote: %w", filePath, err)
+		return fmt.Errorf("cmd error while deleting %s on remote: %w", filePath, err)
 	}
 	return nil
 }
 
 // checkDir makes sure we properly plug on notifications for eventual subdirs
-func (w *Watcher) checkDir(ev *fsnotify.FileEvent) error {
+func (w *Watcher) checkDir(ctx context.Context, ev *fsnotify.FileEvent) error {
 	path := ev.Name
 	switch {
 	case ev.IsDelete() || ev.IsRename():
@@ -151,7 +175,7 @@ func (w *Watcher) checkDir(ev *fsnotify.FileEvent) error {
 		_ = w.notifier.RemoveWatch(path)
 	case ev.IsCreate():
 		// if it's a dir that's been created, we need to add subdirs - fsnotify isn't recursive, this is how we circumvent it
-		err := w.walk(path)
+		err := w.walk(ctx, path)
 		if err != nil {
 			return fmt.Errorf("error while checking dir for new event: %w", err)
 		}
@@ -159,7 +183,7 @@ func (w *Watcher) checkDir(ev *fsnotify.FileEvent) error {
 	return nil
 }
 
-func (w *Watcher) walk(dirPath string) error {
+func (w *Watcher) walk(ctx context.Context, dirPath string) error {
 	// check for subdirs
 	err := filepath.Walk(dirPath,
 		func(path string, info os.FileInfo, err error) error {
@@ -173,10 +197,19 @@ func (w *Watcher) walk(dirPath string) error {
 			if err != nil {
 				return fmt.Errorf("unable to add dir %s for watch: %w", dirPath, err)
 			}
+			w.createDir(ctx, path)
 			return nil
 		})
 	if err != nil {
 		return fmt.Errorf("error while walking path %s: %w", dirPath, err)
 	}
 	return nil
+}
+
+func getRights(path string) (uint32, error) {
+	stats, err := os.Lstat(path)
+	if err != nil {
+		return 0, fmt.Errorf("can't lstat %s: %w", path, err)
+	}
+	return uint32(stats.Mode().Perm()), nil
 }

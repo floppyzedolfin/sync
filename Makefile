@@ -7,33 +7,37 @@ GO=GO111MODULE=on CGO_ENABLED=0 go
 PLAYGROUND=${PWD}/example/playground
 REPLICA=${PWD}/example/replica
 
+SERVER_ADDRESS=178.18.0.23
+SERVER_PORT=8405
+LOCAL_REPLICA_DIR=/data/replica
+
 generate:
 	${GO} generate ./...
-
-compile-reference:
-	${GO} build -o build/reference/reference.out ./reference/service/cmd
 
 compile-watcher:
 	${GO} build -o build/watcher/watcher.out ./watcher/cmd
 
-compile-all: compile-reference compile-watcher
+compile-replica:
+	${GO} build -o build/replica/replica.out ./replica/cmd
+
+compile-all: compile-watcher compile-replica
 
 test:
 	${GO} test ./...
 
-build-all: compile
-	docker build -t ${PROJECT}-reference:${VERSION} build/reference
+build-all: compile-all
+	docker build -t ${PROJECT}-replica:${VERSION} build/replica
 
 network:
 	docker network create --subnet=178.18.0.0/16 network-${PROJECT} || true
 
-run-reference: network
-	docker run -d -p 8405:8405 -v ${REPLICA}:/data/replica --network network-${PROJECT} --ip 178.18.0.23 --rm --name reference ${PROJECT}-reference:${VERSION}
+run-replica: network
+	docker run -d -p ${SERVER_PORT}:${SERVER_PORT} -v ${REPLICA}:${LOCAL_REPLICA_DIR} --network network-${PROJECT} --ip ${SERVER_ADDRESS} --rm --name replica ${PROJECT}-replica:${VERSION} -- -local_replica ${LOCAL_REPLICA_DIR} -port ${SERVER_PORT}
 
 make run-watcher:
-	build/watcher/watcher.out ${PLAYGROUND}
+	build/watcher/watcher.out --watched_dir ${PLAYGROUND} --server_addr ${SERVER_ADDRESS}:${SERVER_PORT}
 
-run-all: run-reference run-watcher
+run-all: run-watcher run-replica
 
 stop-all:
-	docker stop reference
+	docker stop replica

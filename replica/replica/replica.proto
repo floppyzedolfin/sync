@@ -1,0 +1,44 @@
+syntax = "proto3";
+option go_package = "github.com/floppyzedolfin/sync/replica/replica";
+
+package replica;
+
+service Replica {
+  // PatchFile patches a file
+  rpc  PatchFile(PatchFileRequest) returns (PatchFileResponse) {}
+  // CreateDir creates a directory
+  rpc CreateDir(CreateDirRequest) returns (CreateDirResponse) {}
+  // Delete an entity on the file system
+  rpc Delete(DeleteRequest) returns (DeleteResponse) {}
+}
+
+// PatchFileRequest holds the information about an item that has changed
+message PatchFileRequest {
+  string fullPath = 1;
+  string fullContents = 2;
+  uint32 rights = 3;
+}
+
+// PatchFileResponse is empty so far - we'll either return an error or nothing
+// "No news is good news" -- Aegeus
+message PatchFileResponse {
+}
+
+// CreateDirRequest contains the path of the entity to delete
+message CreateDirRequest {
+  string fullPath = 1;
+  uint32 rights = 2;
+}
+
+// CreateDirResponse is always empty
+message CreateDirResponse {
+}
+
+// DeleteRequest contains the path of the entity to delete
+message DeleteRequest {
+  string fullPath = 1;
+}
+
+// DeleteResponse is always empty
+message DeleteResponse {
+}

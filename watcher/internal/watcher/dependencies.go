@@ -3,10 +3,11 @@ package watcher
 import (
 	"context"
 
-	"github.com/floppyzedolfin/sync/reference/client/reference"
+	pb "github.com/floppyzedolfin/sync/replica/replica"
 )
 
-type Reference interface {
-	Patch(context.Context, reference.PatchRequest) (*reference.PatchResponse, error)
-	Delete(context.Context, reference.DeleteRequest) (*reference.DeleteResponse, error)
+type server interface {
+	PatchFile(context.Context, pb.PatchFileRequest) (*pb.PatchFileResponse, error)
+	CreateDir(context.Context, pb.CreateDirRequest) (*pb.CreateDirResponse, error)
+	Delete(context.Context, pb.DeleteRequest) (*pb.DeleteResponse, error)
 }
