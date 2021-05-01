@@ -16,7 +16,6 @@ service Replica {
 message PatchFileRequest {
   string fullPath = 1;
   string fullContents = 2;
-  uint32 rights = 3;
 }
 
 // PatchFileResponse is empty so far - we'll either return an error or nothing
@@ -27,7 +26,6 @@ message PatchFileResponse {
 // CreateDirRequest contains the path of the entity to delete
 message CreateDirRequest {
   string fullPath = 1;
-  uint32 rights = 2;
 }
 
 // CreateDirResponse is always empty

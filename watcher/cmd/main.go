@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"log"
 
@@ -28,10 +29,11 @@ func main() {
 		log.Fatalf("unable to get a client to the replica server: %s", err.Error())
 	}
 
-	// start the watch process
-	w, err := watcher.New(c)
+	ctx, cancelFunc := context.WithCancel(context.Background())
+	// start the watching process
+	w, err := watcher.New(c, cancelFunc)
 	if err != nil {
 		log.Fatalf("error while instantiating the watcher: %s", err.Error())
 	}
-	w.Watch(*watchedDir)
+	w.Watch(ctx, *watchedDir)
 }

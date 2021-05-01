@@ -118,3 +118,19 @@ After all these thoughts, I had several choices in mind:
   milliseconds, and shoot a message containing all these N millisecond changes
 - use `os.Lstat` in a `for` loop to detect changes  
  
+I've worked on this for a couple of hours now and the current version is 
+"operational". That is, I managed to have a filed copied from my playground 
+to my replica. There are still some "issues" with the current implementation, -
+for instance, I don't handle links properly. I'm also always sending the 
+full contents of the files to patch, rather than an optimised `diff`.  Since 
+I'm not keeping local copies of the files, I'd have to use the rolling hash 
+suggested by the assignment. This will greatly depend on the amount of time 
+I can still spend on this task.
+
+My current implementation could be missing some files. Indeed, if a file is 
+created in a directory that isn't yet under watch, that file's creation 
+won't be caught. This could happen as a result of `mkdir foo && touch 
+foo/bar`, with my code starting to listen at `foo` after the creation of 
+foo/bar. 
+
+I need some more tests than those I manually performed.
