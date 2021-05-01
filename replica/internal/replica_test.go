@@ -11,6 +11,7 @@ import (
 
 	pb "github.com/floppyzedolfin/sync/replica/replica"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 const localTestDir = "./test_data"
@@ -50,7 +51,7 @@ func TestServer_CreateDir(t *testing.T) {
 				assert.Error(t, err)
 				assert.Contains(t, err.Error(), tc.err)
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				fullPath := path.Join(localTestDir, tc.req.FullPath)
 				stat, err := os.Lstat(fullPath)
 				assert.NoError(t, err)
@@ -96,7 +97,7 @@ func TestServer_Delete(t *testing.T) {
 				assert.Error(t, err)
 				assert.Contains(t, err.Error(), tc.err)
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				_, err = os.Stat(path.Join(localTestDir, tc.req.FullPath))
 				assert.True(t, os.IsNotExist(err))
 			}
@@ -126,7 +127,7 @@ func TestServer_PatchFile(t *testing.T) {
 				assert.Error(t, err)
 				assert.Contains(t, err.Error(), tc.err)
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				filePath := path.Join(localTestDir, tc.req.FullPath)
 				fileContents, _ := os.ReadFile(filePath)
 				assert.Equal(t, tc.req.FullContents, string(fileContents))
