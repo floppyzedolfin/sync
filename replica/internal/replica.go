@@ -22,28 +22,38 @@ const (
 	defaultRights = fs.FileMode(0755)
 )
 
-// PatchFile updates the contents of a file
-func (s *server) PatchFile(ctx context.Context, request *pb.PatchFileRequest) (*pb.PatchFileResponse, error) {
-	fmt.Printf("patching file %s\n", path.Join(s.localReplicaPath, request.FullPath))
+// File updates the contents of a file
+func (s *server) File(_ context.Context, request *pb.FileRequest) (*pb.FileResponse, error) {
+	fmt.Printf("Patching file %s\n", path.Join(s.localReplicaPath, request.FullPath))
 	err := ioutil.WriteFile(path.Join(s.localReplicaPath, request.FullPath), []byte(request.FullContents), defaultRights)
 	if err != nil {
-		return nil, fmt.Errorf("unable to patch file %s: %w", request.FullPath, err)
+		return nil, fmt.Errorf("unable to  file %s: %w", request.FullPath, err)
 	}
-	return &pb.PatchFileResponse{}, nil
+	return &pb.FileResponse{}, nil
 }
 
-// CreateDir creates a directory
-func (s *server) CreateDir(ctx context.Context, request *pb.CreateDirRequest) (*pb.CreateDirResponse, error) {
+// Link creates a link to a target
+func (s *server) Link(_ context.Context, request *pb.LinkRequest) (*pb.LinkResponse, error) {
+	fmt.Printf("Creating a link at %s to %s\n", path.Join(s.localReplicaPath, request.FullPath), path.Join(s.localReplicaPath, request.Target))
+	err := os.Symlink(path.Join(s.localReplicaPath, request.Target), path.Join(s.localReplicaPath, request.FullPath))
+	if err != nil {
+		return nil, fmt.Errorf("unable to create link %s: %w", request.FullPath, err)
+	}
+	return &pb.LinkResponse{}, nil
+}
+
+// Directory creates a directory
+func (s *server) Directory(_ context.Context, request *pb.DirectoryRequest) (*pb.DirectoryResponse, error) {
 	fmt.Printf("creating dir %s\n", path.Join(s.localReplicaPath, request.FullPath))
 	err := os.Mkdir(path.Join(s.localReplicaPath, request.FullPath), defaultRights)
 	if err != nil {
 		return nil, fmt.Errorf("unable to create dir %s: %w", request.FullPath, err)
 	}
-	return &pb.CreateDirResponse{}, nil
+	return &pb.DirectoryResponse{}, nil
 }
 
 // Delete removes a file system entity
-func (s *server) Delete(ctx context.Context, request *pb.DeleteRequest) (*pb.DeleteResponse, error) {
+func (s *server) Delete(_ context.Context, request *pb.DeleteRequest) (*pb.DeleteResponse, error) {
 	fmt.Printf("deleting %s\n", path.Join(s.localReplicaPath, request.FullPath))
 	err := os.Remove(path.Join(s.localReplicaPath, request.FullPath))
 	if err != nil {

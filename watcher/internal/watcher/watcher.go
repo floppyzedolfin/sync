@@ -111,17 +111,33 @@ func (w *Watcher) createOrUpdate(ctx context.Context, path string) error {
 
 // patchFile performs the creation/update of a file on the remote server
 func (w *Watcher) patchFile(ctx context.Context, filePath string) error {
-	contents, err := os.ReadFile(filePath)
+	s, err := os.Lstat(filePath)
 	if err != nil {
-		return fmt.Errorf("unable to read contents of file %s: %w", filePath, err)
+		return fmt.Errorf("unable to read stats from %s: %w", filePath, err)
 	}
-	patchRequest := pb.PatchFileRequest{
-		FullPath:     strings.TrimPrefix(filePath, w.rootDir),
-		FullContents: string(contents),
-	}
-	_, err = w.replicaClient.PatchFile(ctx, &patchRequest)
-	if err != nil {
-		return fmt.Errorf("cmd error when patching %s: %w", filePath, err)
+	if s.Mode()&os.ModeSymlink == os.ModeSymlink {
+		target, err := os.Readlink(filePath)
+		if err != nil {
+			return fmt.Errorf("unable to follow link %s: %w", filePath, err)
+		}
+		linkRequest := pb.LinkRequest{FullPath: strings.TrimPrefix(filePath, w.rootDir),Target: strings.TrimPrefix(target, w.rootDir)}
+		_, err = w.replicaClient.Link(ctx, &linkRequest)
+		if err != nil {
+			return fmt.Errorf("server error while creating link %s: %w", filePath, err)
+		}
+	} else {
+		contents, err := os.ReadFile(filePath)
+		if err != nil {
+			return fmt.Errorf("unable to read contents of file %s: %w", filePath, err)
+		}
+		patchRequest := pb.FileRequest{
+			FullPath:     strings.TrimPrefix(filePath, w.rootDir),
+			FullContents: string(contents),
+		}
+		_, err = w.replicaClient.File(ctx, &patchRequest)
+		if err != nil {
+			return fmt.Errorf("cmd error when patching %s: %w", filePath, err)
+		}
 	}
 	return nil
 }
@@ -129,10 +145,10 @@ func (w *Watcher) patchFile(ctx context.Context, filePath string) error {
 // createDir creates a directory (and its subdirectories) on the remove file server
 func (w *Watcher) createDir(ctx context.Context, dirPath string) error {
 	fmt.Println("creating dir " + dirPath)
-	createDirRequest := pb.CreateDirRequest{
+	createDirRequest := pb.DirectoryRequest{
 		FullPath: strings.TrimPrefix(dirPath, w.rootDir),
 	}
-	_, err := w.replicaClient.CreateDir(ctx, &createDirRequest)
+	_, err := w.replicaClient.Directory(ctx, &createDirRequest)
 	if err != nil {
 		return fmt.Errorf("server error while creating dir %s: %w", dirPath, err)
 	}

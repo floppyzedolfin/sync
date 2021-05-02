@@ -42,7 +42,7 @@ git clone https://github.com/floppyzedolfin/sync.git
 ### ... compile it
 Use the `make` target:
 ```bash
-make compile
+make compile-all
 ```
 
 ### ... run it
@@ -52,7 +52,7 @@ and then start the client.
 ```bash
 make run-all
 ```
-The [`Makfeile`](./Makefile) provides several other (internal) targets. If 
+The [`Makefile`](./Makefile) provides several other (internal) targets. If 
 you examine it closely, you'll find that
 - a docker network is started, to simulate real networks and communication 
   to a remote server;
@@ -65,10 +65,11 @@ you examine it closely, you'll find that
 ### ... play with it
 Once everything is up and running, simply add, alter, move, delete files in 
 the directory that the `watcher` was given to examine. These changes should be 
-mirrored n the `reference` directory (because the server will update them in 
-its docker image).
+mirrored n the `replica` directory (because the server will update them in 
+its docker image). 
 
-### TODOs & loopholes
-- user in docker
-- rights on files
-- 
+The server runs in a docker image - you can get its logs with `docker logs 
+-f replica`. The watcher runs in the terminal it is launched.
+
+### TODOs
+- Improve transfer of files

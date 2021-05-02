@@ -18,10 +18,12 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ReplicaClient interface {
-	// PatchFile patches a file
-	PatchFile(ctx context.Context, in *PatchFileRequest, opts ...grpc.CallOption) (*PatchFileResponse, error)
-	// CreateDir creates a directory
-	CreateDir(ctx context.Context, in *CreateDirRequest, opts ...grpc.CallOption) (*CreateDirResponse, error)
+	// File patches a file
+	File(ctx context.Context, in *FileRequest, opts ...grpc.CallOption) (*FileResponse, error)
+	// Directory creates a directory
+	Directory(ctx context.Context, in *DirectoryRequest, opts ...grpc.CallOption) (*DirectoryResponse, error)
+	// Link creates a link
+	Link(ctx context.Context, in *LinkRequest, opts ...grpc.CallOption) (*LinkResponse, error)
 	// Delete an entity on the file system
 	Delete(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*DeleteResponse, error)
 }
@@ -34,18 +36,27 @@ func NewReplicaClient(cc grpc.ClientConnInterface) ReplicaClient {
 	return &replicaClient{cc}
 }
 
-func (c *replicaClient) PatchFile(ctx context.Context, in *PatchFileRequest, opts ...grpc.CallOption) (*PatchFileResponse, error) {
-	out := new(PatchFileResponse)
-	err := c.cc.Invoke(ctx, "/replica.Replica/PatchFile", in, out, opts...)
+func (c *replicaClient) File(ctx context.Context, in *FileRequest, opts ...grpc.CallOption) (*FileResponse, error) {
+	out := new(FileResponse)
+	err := c.cc.Invoke(ctx, "/replica.Replica/File", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *replicaClient) CreateDir(ctx context.Context, in *CreateDirRequest, opts ...grpc.CallOption) (*CreateDirResponse, error) {
-	out := new(CreateDirResponse)
-	err := c.cc.Invoke(ctx, "/replica.Replica/CreateDir", in, out, opts...)
+func (c *replicaClient) Directory(ctx context.Context, in *DirectoryRequest, opts ...grpc.CallOption) (*DirectoryResponse, error) {
+	out := new(DirectoryResponse)
+	err := c.cc.Invoke(ctx, "/replica.Replica/Directory", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *replicaClient) Link(ctx context.Context, in *LinkRequest, opts ...grpc.CallOption) (*LinkResponse, error) {
+	out := new(LinkResponse)
+	err := c.cc.Invoke(ctx, "/replica.Replica/Link", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -65,10 +76,12 @@ func (c *replicaClient) Delete(ctx context.Context, in *DeleteRequest, opts ...g
 // All implementations must embed UnimplementedReplicaServer
 // for forward compatibility
 type ReplicaServer interface {
-	// PatchFile patches a file
-	PatchFile(context.Context, *PatchFileRequest) (*PatchFileResponse, error)
-	// CreateDir creates a directory
-	CreateDir(context.Context, *CreateDirRequest) (*CreateDirResponse, error)
+	// File patches a file
+	File(context.Context, *FileRequest) (*FileResponse, error)
+	// Directory creates a directory
+	Directory(context.Context, *DirectoryRequest) (*DirectoryResponse, error)
+	// Link creates a link
+	Link(context.Context, *LinkRequest) (*LinkResponse, error)
 	// Delete an entity on the file system
 	Delete(context.Context, *DeleteRequest) (*DeleteResponse, error)
 	mustEmbedUnimplementedReplicaServer()
@@ -78,11 +91,14 @@ type ReplicaServer interface {
 type UnimplementedReplicaServer struct {
 }
 
-func (UnimplementedReplicaServer) PatchFile(context.Context, *PatchFileRequest) (*PatchFileResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method PatchFile not implemented")
+func (UnimplementedReplicaServer) File(context.Context, *FileRequest) (*FileResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method File not implemented")
 }
-func (UnimplementedReplicaServer) CreateDir(context.Context, *CreateDirRequest) (*CreateDirResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CreateDir not implemented")
+func (UnimplementedReplicaServer) Directory(context.Context, *DirectoryRequest) (*DirectoryResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Directory not implemented")
+}
+func (UnimplementedReplicaServer) Link(context.Context, *LinkRequest) (*LinkResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Link not implemented")
 }
 func (UnimplementedReplicaServer) Delete(context.Context, *DeleteRequest) (*DeleteResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
@@ -100,38 +116,56 @@ func RegisterReplicaServer(s grpc.ServiceRegistrar, srv ReplicaServer) {
 	s.RegisterService(&Replica_ServiceDesc, srv)
 }
 
-func _Replica_PatchFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PatchFileRequest)
+func _Replica_File_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FileRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ReplicaServer).PatchFile(ctx, in)
+		return srv.(ReplicaServer).File(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/replica.Replica/PatchFile",
+		FullMethod: "/replica.Replica/File",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ReplicaServer).PatchFile(ctx, req.(*PatchFileRequest))
+		return srv.(ReplicaServer).File(ctx, req.(*FileRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Replica_CreateDir_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CreateDirRequest)
+func _Replica_Directory_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DirectoryRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ReplicaServer).CreateDir(ctx, in)
+		return srv.(ReplicaServer).Directory(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/replica.Replica/CreateDir",
+		FullMethod: "/replica.Replica/Directory",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ReplicaServer).CreateDir(ctx, req.(*CreateDirRequest))
+		return srv.(ReplicaServer).Directory(ctx, req.(*DirectoryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Replica_Link_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LinkRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ReplicaServer).Link(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/replica.Replica/Link",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ReplicaServer).Link(ctx, req.(*LinkRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -162,12 +196,16 @@ var Replica_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*ReplicaServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "PatchFile",
-			Handler:    _Replica_PatchFile_Handler,
+			MethodName: "File",
+			Handler:    _Replica_File_Handler,
 		},
 		{
-			MethodName: "CreateDir",
-			Handler:    _Replica_CreateDir_Handler,
+			MethodName: "Directory",
+			Handler:    _Replica_Directory_Handler,
+		},
+		{
+			MethodName: "Link",
+			Handler:    _Replica_Link_Handler,
 		},
 		{
 			MethodName: "Delete",

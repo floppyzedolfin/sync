@@ -11,10 +11,12 @@ import (
 
 // server lists the methods called by this package
 type server interface {
-	// PatchFile patches a file
-	PatchFile(ctx context.Context, in *pb.PatchFileRequest, opts ...grpc.CallOption) (*pb.PatchFileResponse, error)
-	// CreateDir creates a directory
-	CreateDir(ctx context.Context, in *pb.CreateDirRequest, opts ...grpc.CallOption) (*pb.CreateDirResponse, error)
+	// File patches a file
+	File(ctx context.Context, in *pb.FileRequest, opts ...grpc.CallOption) (*pb.FileResponse, error)
+	// Link creates a link
+	Link(ctx context.Context, in *pb.LinkRequest, opts ...grpc.CallOption) (*pb.LinkResponse, error)
+	// Directory creates a directory
+	Directory(ctx context.Context, in *pb.DirectoryRequest, opts ...grpc.CallOption) (*pb.DirectoryResponse, error)
 	// Delete an entity on the file system
 	Delete(ctx context.Context, in *pb.DeleteRequest, opts ...grpc.CallOption) (*pb.DeleteResponse, error)
 }
