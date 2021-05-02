@@ -60,7 +60,7 @@ func (w *Watcher) poll(ctx context.Context) {
 		case ev := <-w.notifier.Event:
 			err := w.sendEvent(ctx, ev)
 			if err != nil {
-				fmt.Printf("error while sending event for %s to server: %s", ev.Name, err.Error())
+				fmt.Printf("error while sending event to server: %s", err.Error())
 				w.cancelFunc()
 			}
 		case e := <-w.notifier.Error:
@@ -86,7 +86,7 @@ func (w *Watcher) sendEvent(ctx context.Context, ev *fsnotify.FileEvent) error {
 		err = w.delete(ctx, ev.Name)
 	}
 	if err != nil {
-		return fmt.Errorf("error while processing cached file: %w", err)
+		return fmt.Errorf("error while handling event: %w", err)
 	}
 	return nil
 }
@@ -104,7 +104,7 @@ func (w *Watcher) createOrUpdate(ctx context.Context, path string) error {
 		err = w.patchFile(ctx, path)
 	}
 	if err != nil {
-		return fmt.Errorf("unable to update %s: %w", path, err)
+		return fmt.Errorf("unable to process: %w", err)
 	}
 	return nil
 }
@@ -136,7 +136,7 @@ func (w *Watcher) patchFile(ctx context.Context, filePath string) error {
 		}
 		_, err = w.replicaClient.File(ctx, &patchRequest)
 		if err != nil {
-			return fmt.Errorf("cmd error when patching %s: %w", filePath, err)
+			return fmt.Errorf("server error when patching %s: %w", filePath, err)
 		}
 	}
 	return nil
@@ -182,7 +182,7 @@ func (w *Watcher) walk(ctx context.Context, dirPath string) error {
 				// this scenario can happen if the user creates a file inside a dir that isn't under scrupulous examination
 				err = w.patchFile(ctx, path)
 				if err != nil {
-					return fmt.Errorf("error while adding file %s in the new directory %s: %w", path, dirPath, err)
+					return fmt.Errorf("error while adding file in the new directory %s: %w", dirPath, err)
 				}
 				return nil
 			}
@@ -194,7 +194,7 @@ func (w *Watcher) walk(ctx context.Context, dirPath string) error {
 			}
 			err = w.createDir(ctx, path)
 			if err != nil {
-				return fmt.Errorf("unable to create remote dir at %s: %w", path, err)
+				return fmt.Errorf("unable to create remote dir: %w", err)
 			}
 			return nil
 		})

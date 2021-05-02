@@ -34,8 +34,9 @@ func (s *server) File(_ context.Context, request *pb.FileRequest) (*pb.FileRespo
 
 // Link creates a link to a target
 func (s *server) Link(_ context.Context, request *pb.LinkRequest) (*pb.LinkResponse, error) {
-	fmt.Printf("Creating a link at %s to %s\n", path.Join(s.localReplicaPath, request.FullPath), path.Join(s.localReplicaPath, request.Target))
-	err := os.Symlink(path.Join(s.localReplicaPath, request.Target), path.Join(s.localReplicaPath, request.FullPath))
+	linkLocation := path.Join(s.localReplicaPath, request.FullPath)
+	fmt.Printf("Creating a link at %s to %s\n", linkLocation, request.Target)
+	err := os.Symlink(request.Target, linkLocation)
 	if err != nil {
 		return nil, fmt.Errorf("unable to create link %s: %w", request.FullPath, err)
 	}
