@@ -64,8 +64,8 @@ you examine it closely, you'll find that
 
 ### ... play with it
 Once everything is up and running, simply add, alter, move, delete files in 
-the directory that the `watcher` was given to examine. These changes should be 
-mirrored n the `replica` directory (because the server will update them in 
+the directory that the `watcher` was given to examine. These changes will be 
+mirrored in the `replica` directory (because the server will update them in 
 its docker image). 
 
 The server runs in a docker image - you can get its logs with `docker logs 

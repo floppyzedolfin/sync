@@ -15,7 +15,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-const localTestDir = "./test_data"
+const localTestDir = "./testdata"
 
 func TestServer_Directory(t *testing.T) {
 	tt := map[string]struct {

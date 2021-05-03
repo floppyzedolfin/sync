@@ -1,9 +1,8 @@
 PROJECT=sync
 VERSION=1.0.0
 
-# GO111MODULE=on means we're using modules and not the olde vendor dir and $GO*** environment variables
 # CGO_ENABLED=0 means we're not looking for C libs when using the network packages (which comes in handy when using scratch images)
-GO=GO111MODULE=on CGO_ENABLED=0 go
+GO=CGO_ENABLED=0 go
 PLAYGROUND=${PWD}/example/playground
 REPLICA=${PWD}/example/replica
 
@@ -24,6 +23,9 @@ compile-all: compile-watcher compile-replica
 
 test:
 	${GO} test ./...
+
+cover:
+	${GO} test ./... --cover
 
 build-all: compile-all
 	docker build -t ${PROJECT}-replica:${VERSION} build/replica

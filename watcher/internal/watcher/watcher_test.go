@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	localDir = "./test_data"
+	localDir = "./testdata"
 )
 
 func TestWatcher_Watch(t *testing.T) {

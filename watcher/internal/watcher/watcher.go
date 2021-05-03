@@ -97,10 +97,9 @@ func (w *Watcher) createOrUpdate(ctx context.Context, path string) error {
 		return fmt.Errorf("unable to get stat of %s: %w", path, err)
 	}
 
-	switch {
-	case s.IsDir():
+	if s.IsDir() {
 		err = w.walk(ctx, path)
-	default:
+	} else {
 		err = w.patchFile(ctx, path)
 	}
 	if err != nil {

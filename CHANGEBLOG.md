@@ -3,7 +3,7 @@
 ### First thoughts
 
 My first thought, after reading the assignment, was that my solution, 
-whatever it will be, won't be as complete as  other utilities. I won't wrap  
+whatever it will be, won't be as complete as other utilities. I won't wrap  
 over `rsync`, as explained. However, really early, I wanted to delegate the 
 "detect which files have been updated" to some intelligent tool.
 
@@ -13,7 +13,7 @@ over `rsync`, as explained. However, really early, I wanted to delegate the
 - optimize (in some ways) volumes
 
 After checking with the company, they told me that wrapping `git` wasn't 
-interesting, which I agree with. I've extrapolated this and decided to also 
+interesting, with which I agree. I've extrapolated this and decided to also 
 not use `go-git`.
 
 I thus need to write code that
