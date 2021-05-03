@@ -79,11 +79,13 @@ func (w *Watcher) sendEvent(ctx context.Context, ev *fsnotify.FileEvent) error {
 		return nil
 	}
 	var err error
-	update := ev.IsCreate() || ev.IsModify() || ev.IsAttrib()
-	if update {
+	switch {
+	case ev.IsCreate() || ev.IsModify() || ev.IsAttrib():
 		err = w.createOrUpdate(ctx, ev.Name)
-	} else {
+	case ev.IsDelete() || ev.IsRename():
 		err = w.delete(ctx, ev.Name)
+	default:
+		// ignore the event
 	}
 	if err != nil {
 		return fmt.Errorf("error while handling event: %w", err)
