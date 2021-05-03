@@ -26,7 +26,7 @@ func TestWatcher_Watch(t *testing.T) {
 
 	tt := map[string]struct {
 		rootDir       string
-		actions       []action //actions separated by 100ms
+		actions       []action // actions separated by 100ms
 		replicaClient func(controller *gomock.Controller) server
 		err           string
 	}{
@@ -81,7 +81,7 @@ func TestWatcher_Watch(t *testing.T) {
 			replicaClient: func(mockCtrl *gomock.Controller) server {
 				s := mock_watcher.NewMockserver(mockCtrl)
 				s.EXPECT().File(gomock.Any(), gomock.Any()).Return(nil, nil).Times(2)
-				s.EXPECT().Delete(gomock.Any(), gomock.Any()).Return(nil, fmt.Errorf("server delete error"))
+				s.EXPECT().Delete(gomock.Any(), gomock.Any()).Return(nil, fmt.Errorf("server delete error\n"))
 				return s
 			},
 			err: "context cancelled",
@@ -91,7 +91,7 @@ func TestWatcher_Watch(t *testing.T) {
 			actions: []action{{op: createFile, path: "created_file", contents: "bar"}},
 			replicaClient: func(mockCtrl *gomock.Controller) server {
 				s := mock_watcher.NewMockserver(mockCtrl)
-				s.EXPECT().File(gomock.Any(), gomock.Any()).Return(nil, fmt.Errorf("server patch error")).AnyTimes()
+				s.EXPECT().File(gomock.Any(), gomock.Any()).Return(nil, fmt.Errorf("server patch error\n")).AnyTimes()
 				return s
 			},
 			err: "context cancelled",
@@ -101,7 +101,7 @@ func TestWatcher_Watch(t *testing.T) {
 			actions: []action{{op: createDir, path: "created_dir"}},
 			replicaClient: func(mockCtrl *gomock.Controller) server {
 				s := mock_watcher.NewMockserver(mockCtrl)
-				s.EXPECT().Directory(gomock.Any(), gomock.Any()).Return(nil, fmt.Errorf("server create dir error"))
+				s.EXPECT().Directory(gomock.Any(), gomock.Any()).Return(nil, fmt.Errorf("server create dir error\n"))
 				return s
 			},
 			err: "context cancelled",
